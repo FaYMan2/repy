@@ -20,6 +20,7 @@ print(res1.decode())
 serv1.shutdown(1)
 serv1.close()
 
+
 serv2 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 serv2.connect(("localhost",6379))
 serv2.send(b'get\r\nfoo')
