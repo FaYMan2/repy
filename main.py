@@ -1,6 +1,6 @@
 import socket
 from eventLoop import eventLoop
-from eventLoop import acceptIncommingConnections,getIncommingEvents
+from eventLoop import acceptIncommingConnections
 from _thread import start_new_thread
 import asyncio
 def stillConnected(connection):
@@ -13,13 +13,12 @@ def stillConnected(connection):
 def main():
     servSock = socket.create_server(("localhost",6379))
     loop = eventLoop(server=servSock)
-    start_new_thread(acceptIncommingConnections,(loop,))    
     while True:
         #print(f'no connected = {loop.connectionCount}')
-        getIncommingEvents(loop)
+        acceptIncommingConnections(loop)
         if loop.connectionCount:
             loop.fireEvetnts()
-            print(loop.connections)
+            print(loop.events)
 
 if __name__ == "__main__":
     main()

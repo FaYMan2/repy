@@ -40,20 +40,19 @@ class eventLoop:
                     else:
                         event.conn.conn.send(f"-DATA NOT FOUND\r\n")
                         
+            event.conn.conn.shutdown(1)
             event.conn.conn.close()
+            self.connectionCount -= 1
             self.events.popleft()
                         
 def acceptIncommingConnections(loop : eventLoop):
-    while True:
-        conn,addr = loop.serv.accept()
-        loop.connections.append(connection(conn = conn,addr = addr))
-        loop.connectionCount += 1
+    conn,addr = loop.serv.accept()
+    data : bytes = conn.recv(512)
+    connData = connection(conn = conn,addr = addr)
+    loop.events.append(event(connData,data.decode()))
+    loop.connectionCount += 1
         
-def getIncommingEvents(loop : eventLoop):
-    if loop.connectionCount > 0:
-        for connection in loop.connections:
-            data = connection.conn.recv(1028)
-            loop.events.append(event(connection,data.decode()))
+
     
         
 
