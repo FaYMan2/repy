@@ -10,5 +10,7 @@ class command:
         self.type = splitedCommand[0]
         if splitedCommand[-2] == 'px':
             self.expiry = int(splitedCommand[-1])
-        self.content = splitedCommand[1:]
+            self.content = splitedCommand[1:-2]
+        else:
+            self.content = splitedCommand[1:]
         
