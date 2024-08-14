@@ -8,7 +8,7 @@ class command:
     def decodeCommand(self):
         splitedCommand = self.__rawCommand.split("\r\n")
         self.type = splitedCommand[0]
-        if splitedCommand[-2] == 'px':
+        if len(splitedCommand) > 2 and splitedCommand[-2] == 'px':
             self.expiry = int(splitedCommand[-1])
             self.content = splitedCommand[1:-2]
         else:

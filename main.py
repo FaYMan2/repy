@@ -3,6 +3,7 @@ from eventLoop import eventLoop
 from eventLoop import acceptIncommingConnections
 from _thread import start_new_thread
 import asyncio
+from argparse import ArgumentParser
 def stillConnected(connection):
     try:
         connection.send(b'')
@@ -11,8 +12,10 @@ def stillConnected(connection):
         return False
     
 def main():
-    servSock = socket.create_server(("localhost",6379))
-    loop = eventLoop(server=servSock)
+    parser = ArgumentParser("Redis server---;)")
+    parser.add_argument("--port",type=int,default=6379)
+    servSock = socket.create_server(("localhost",parser.parse_args().port))
+    loop = eventLoop(server=servSock,role="master")
     while True:
         #print(f'no connected = {loop.connectionCount}')
         acceptIncommingConnections(loop)

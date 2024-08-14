@@ -3,7 +3,7 @@ from cmds import command
 from collections import deque,defaultdict
 import time
 class connection():
-    def __init__(self,conn : socket.socket,addr : tuple[str,int]):
+    def __init__(self,conn : socket.socket,addr : tuple[str,int]) -> None:
         self.conn = conn
         self.addr = addr
 
@@ -12,14 +12,14 @@ class event():
         self.conn = conn
         self.data = data
 class eventLoop:
-    def __init__(self,server : socket.socket):
+    def __init__(self,server : socket.socket,role : str):
         self.events : deque[event] = deque([])
         self.firedEvents = []
         self.connectionCount : int  = 0
         self.serv : socket.socket = server
         self.store : dict[str:str] = {}
         self.expiry : dict = defaultdict(int)
-        
+        self.role : str = role
     def fireEvetnts(self):
         eventCopy = self.events.copy()
         for event in eventCopy:
@@ -39,7 +39,7 @@ class eventLoop:
                 elif cmd.type == "get":
                     if cmd.content[0] in self.expiry and (time.time() * 1000) - self.expiry[cmd.content[0]] < 0:
                        # print(f'expiry of get : {self.expiry[cmd.content[0]]}\n current time : {time.time() * 1000}\ndifference : {(time.time() * 1000) - self.expiry[cmd.content[0]]}')
-                        data : str = self.store.get(cmd.content[0],-1)
+                        data : list[str] = self.store.get(cmd.content[0],-1)
                         if data != -1:
                             event.conn.conn.send(f"${len(data)}\r\n{data}".encode())
                         else:
@@ -48,6 +48,8 @@ class eventLoop:
                         del self.store[cmd.content[0]]
                         del self.expiry[cmd.content[0]]
                         event.conn.conn.send(b"-Data expired")
+                elif cmd.type == "INFO":
+                    event.conn.conn.send(f'+INFO\r\nROLE : {self.role}'.encode())
             event.conn.conn.shutdown(1)
             event.conn.conn.close()
             self.connectionCount -= 1
